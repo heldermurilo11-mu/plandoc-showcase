@@ -223,3 +223,28 @@ stateDiagram-v2
 ```
 
 While in `CLOSING`, Firestore Rules, Storage session guards, and Admin SDK guarded writes reject new document mutations until either every deliverable/dispatch invariant passes (transitioning to `CLOSED` with an immutable `projectClosureSnapshots/{operationId}`) or an explicit blocker restores `OPEN`.
+
+---
+
+## 6. Transactional External Confirmation Lease & Fail-Closed Outbox
+
+Confirming external recipient configurations or per-document overrides acquires a time-bounded snapshot lease before provisioning temporary credentials or triggering outbound notifications:
+
+```mermaid
+stateDiagram-v2
+    state "Confirmation Lease Lifecycle" as CL {
+        DRAFT --> LEASED: reserveConfirmation() - 10m TTL + Snapshot Fingerprint
+        LEASED --> CONFIRMED: All Recipients Provisioned and Fingerprint Matches
+        LEASED --> DRAFT: Partial Failure -> releaseConfirmationLease()
+        LEASED --> ABORTED: Concurrent Snapshot Mutation Detected
+    }
+
+    state "Fail-Closed Credential Retry" as CR {
+        PENDING --> SENDING: Transactional Attempt Reservation
+        SENDING --> SENT: SMTP Accepted (Persist Completed Marker)
+        SENDING --> UNKNOWN: Firestore Failure Post-SMTP (Blocks Auto-Retry)
+        SENDING --> FAILED: SMTP Rejected (Eligible for Audited Manual Retry)
+    }
+```
+
+Separating `UNKNOWN` from `FAILED` guarantees that transient database outages after SMTP acceptance never trigger silent duplicate temporary-password dispatches on retry.
