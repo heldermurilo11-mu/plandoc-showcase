@@ -1,0 +1,26 @@
+name: Docs Hygiene Check
+
+on:
+  pull_request:
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify non-empty Markdown files and no private key headers
+        run: |
+          python3 -c '
+          import pathlib, sys
+          bad = []
+          for p in pathlib.Path(".").rglob("*.md"):
+              txt = p.read_text(encoding="utf-8")
+              if "BEGIN PRIVATE KEY" in txt or "AIzaSy" in txt:
+                  bad.append(str(p))
+          if bad:
+              print("Secret pattern found:", bad)
+              sys.exit(1)
+          print("Docs hygiene OK")
+          '
