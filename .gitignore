@@ -1,0 +1,22 @@
+# OS & Editor artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Environment & Secrets
+.env
+.env.*
+*.pem
+*.key
+*serviceAccount*.json
+*firebase-key*.json
+
+# Logs & Dependencies
+*.log
+node_modules/
+dist/

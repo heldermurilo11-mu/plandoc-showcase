@@ -1,0 +1,11 @@
+Copyright (c) 2026 Helder Murilo. All rights reserved.
+
+This repository contains architectural documentation, diagrams, and technical
+case study materials describing the PlanDoc system architecture for portfolio
+and engineering evaluation purposes.
+
+The production source code, Firebase security rules, cloud function
+implementations, and operational datasets referenced herein are proprietary
+intellectual property and remain private. No license is granted to copy,
+redistribute, or derive commercial implementations of the underlying proprietary
+system without explicit written authorization from the rights holder.
